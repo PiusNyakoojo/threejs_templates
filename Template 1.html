@@ -1,0 +1,106 @@
+<html>
+<head>
+	<title>Template01</title>
+	<script src="js/three.js"></script>
+</head>
+<style>
+body
+{
+	margin: 0;
+	overflow: hidden;
+}
+</style>
+<body>
+
+	<div id='container'></div>
+	<script>
+		var container, scene, camera, renderer, raycaster, objects = [];
+
+		init();
+		animate();
+
+		function init(){
+
+			//Setup------------------------------------------
+			container = document.getElementById('container');
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+
+			renderer = new THREE.WebGLRenderer( { alpha: true} );
+			renderer.setSize( window.innerWidth, window.innerHeight);
+
+			raycaster = new THREE.Raycaster();
+			//Create and Add Objects To the Scene HERE-------------------
+
+
+
+			//Events------------------------------------------
+			document.addEventListener('click', onMouseClick, false );
+			document.addEventListener('mousedown', onMouseDown, false);
+			document.addEventListener('mouseup', onMouseUp, false);
+			document.addEventListener('mousemove', onMouseMove, false);
+			document.addEventListener('mouseout', onMouseOut, false);
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			//Final touches-----------------------------------
+			container.appendChild( renderer.domElement );
+			document.body.appendChild( container );
+		}
+
+		function animate(){
+			requestAnimationFrame( animate );
+			render();
+		}
+		function render(){
+			//Render Scene---------------------------------------
+        	renderer.clear();
+			renderer.render( scene , camera );
+		}
+		
+		function onMouseClick(){
+			intersects = calculateIntersects( event );
+
+			if ( intersects.length > 0 ){
+				//If object is intersected by mouse pointer, do something
+			}
+		}
+		function onMouseDown(){
+
+		}
+		function onMouseUp(){
+
+		}
+		function onMouseMove(){
+			
+		}
+		function onMouseOut(){
+
+		}
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+		function calculateIntersects( event ){
+			
+			//Determine objects intersected by raycaster
+			event.preventDefault();
+
+			var vector = new THREE.Vector3();
+			vector.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+			vector.unproject( camera );
+
+			raycaster.ray.set( camera.position, vector.sub( camera.position ).normalize() );
+
+			var intersects = raycaster.intersectObjects( objects );
+			
+			return intersects;
+		}
+	</script>
+</body>
+</html>
