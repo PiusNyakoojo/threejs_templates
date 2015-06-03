@@ -22,11 +22,11 @@ body
 		function init(){
 
 			//Setup------------------------------------------
-			container = document.getElementById('container');
+			container = document.getElementById( 'container' );
 
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 
 			renderer = new THREE.WebGLRenderer( { alpha: true} );
 			renderer.setSize( window.innerWidth, window.innerHeight);
@@ -37,11 +37,13 @@ body
 
 
 			//Events------------------------------------------
-			document.addEventListener('click', onMouseClick, false );
-			document.addEventListener('mousedown', onMouseDown, false);
-			document.addEventListener('mouseup', onMouseUp, false);
-			document.addEventListener('mousemove', onMouseMove, false);
-			document.addEventListener('mouseout', onMouseOut, false);
+			document.addEventListener( 'click', onMouseClick, false );
+			document.addEventListener( 'mousedown', onMouseDown, false );
+			document.addEventListener( 'mouseup', onMouseUp, false );
+			document.addEventListener( 'mousemove', onMouseMove, false );
+			document.addEventListener( 'mouseout', onMouseOut, false );
+			document.addEventListener( 'keydown', onKeyDown, false );
+			document.addEventListener( 'keyup', onKeyUp, false );
 			window.addEventListener( 'resize', onWindowResize, false );
 
 			//Final touches-----------------------------------
@@ -59,24 +61,34 @@ body
 			renderer.render( scene , camera );
 		}
 		
-		function onMouseClick(){
+		function onMouseClick( event ){
 			intersects = calculateIntersects( event );
 
 			if ( intersects.length > 0 ){
 				//If object is intersected by mouse pointer, do something
 			}
 		}
-		function onMouseDown(){
+		function onMouseDown( event ){
 
 		}
-		function onMouseUp(){
+		function onMouseUp( event ){
 
 		}
-		function onMouseMove(){
-			
+		function onMouseMove( event ){
+			//event.clientX; mouse x position
+			//event.clientY; mouse y position
 		}
-		function onMouseOut(){
+		function onMouseOut( event ){
 
+		}
+		function onKeyDown( event ){
+
+		}
+		function onKeyUp( event ){
+			/*event.keyCode; key pressed
+			Javascript keycode table:
+			http://www.cambiaresearch.com/articles/15/javascript-char-codes-key-codes
+			*/
 		}
 		function onWindowResize() {
 
