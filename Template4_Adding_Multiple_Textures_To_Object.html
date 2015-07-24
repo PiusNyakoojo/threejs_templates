@@ -1,0 +1,207 @@
+<html>
+<head>
+	<title>Template04 - Adding Multiple Textures to Object</title>
+	<script src="js/three.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/OBJLoader.js"></script>
+</head>
+<style>
+body
+{
+	margin: 0;
+	overflow: hidden;
+}
+</style>
+<body>
+
+
+	<script id="vertex_shh" type="x-shader/x-fragment">
+	// http://stackoverflow.com/questions/16287547/multiple-transparent-textures-on-the-same-mesh-face-in-three-js
+		varying vec2 vUv;
+
+		void main() {
+		    vUv = uv;
+		    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+		    gl_Position = projectionMatrix * mvPosition;
+		}
+	</script>
+
+	<script id="fragment_shh" type="x-shader/x-fragment">
+
+	// http://stackoverflow.com/questions/16287547/multiple-transparent-textures-on-the-same-mesh-face-in-three-js
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
+		uniform sampler2D tOne;
+		uniform sampler2D tSec;
+		uniform sampler2D tThr;
+
+		varying vec2 vUv;
+
+		void main(void) {
+		    vec3 c;
+		    vec4 Ca = texture2D(tOne, vUv);
+		    vec4 Cb = texture2D(tSec, vUv);
+		    vec4 Cc = texture2D(tThr, vUv);
+		    //c = Ca.rgb * Ca.a + Cb.rgb * Cb.a * (1.0 - Ca.a);  // blending equation - for 2 textures
+		    c = Ca.rgb * Ca.a + Cb.rgb * Cb.a * (1.0 - Ca.a) + Cc.rgb * Cc.a * (1.0 - Ca.a - Cb.a); // blendering equation - for 3 textures
+		    gl_FragColor= vec4(c, 1.0);
+		}
+	</script>
+
+	<div id='container'></div>
+	<script>
+		var container, scene, camera, renderer;
+
+		var controls; // OrbitControls are nice to have when determining the scale, translation or rotation of the model
+
+		var loader, onProgress, onError, manager;
+
+
+		init();
+		animate();
+
+		function init() {
+			// Setup
+			container = document.getElementById( 'container' );
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
+	        camera.position.z = 30; 
+
+			controls = new THREE.OrbitControls( camera );
+			controls.damping = 0.2;
+
+			// renderer = new THREE.WebGLRenderer( { alpha: true, logarithmicDepthBuffer: true } ); // Use if model isn't "nice and solid"
+			renderer = new THREE.WebGLRenderer( { alpha: true } );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+			// Add Objects
+
+      		initLights();
+      		loadHandlers();
+
+      		loadObject( '../Models/Location_Of_Object/model.obj',  loadMaterial( "../Textures/Location_Of_Textures/" ) );
+
+			// Events
+			controls.addEventListener( 'change', render );
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			// Final touches
+			container.appendChild( renderer.domElement );
+			document.body.appendChild( container );
+		}
+
+		function animate() {
+			requestAnimationFrame( animate );
+			controls.update();
+			render();
+		}
+
+		function render() {
+			// Render Scene
+        	renderer.clear();
+			renderer.render( scene , camera );
+		}
+
+		function loadMaterial( textureURL ) {
+
+			// http://stackoverflow.com/questions/16287547/multiple-transparent-textures-on-the-same-mesh-face-in-three-js
+
+			var vertShader = document.getElementById('vertex_shh').innerHTML;
+			var fragShader = document.getElementById('fragment_shh').innerHTML;
+
+			var attributes = {}; // custom attributes
+
+			var uniforms = {    // custom uniforms (your textures)
+
+			  tOne: { type: "t", value: THREE.ImageUtils.loadTexture( textureURL + "texture1.png" ) },
+			  tSec: { type: "t", value: THREE.ImageUtils.loadTexture( textureURL + "texture2.png" ) },
+			  tThr: { type: "t", value: THREE.ImageUtils.loadTexture( textureURL + "texture3.png" ) }
+			  // Add more textures here
+
+			};
+
+			var material_shh = new THREE.ShaderMaterial({
+
+			  uniforms: uniforms,
+			  attributes: attributes,
+			  vertexShader: vertShader,
+			  fragmentShader: fragShader
+
+			});
+
+			return material_shh;
+
+		}
+
+		function loadObject( modelURL, material ) {
+
+			// Model
+
+			loader = new THREE.OBJLoader( manager );
+			loader.load( modelURL, function ( object ) {
+
+				object.traverse( function ( child ) {
+
+					if ( child instanceof THREE.Mesh ) {
+
+						child.material = material;
+
+					}
+
+				} );
+
+				scene.add( object );
+
+			}, onProgress, onError );
+
+		}
+
+		function initLights() {
+
+			var light = new THREE.AmbientLight( 0x000044 ); // soft white light
+			scene.add( light );
+
+			var directionalLight = new THREE.DirectionalLight( 0xffffff );
+      		directionalLight.position.set( 1, 1, 1 ).normalize();
+      		scene.add( directionalLight );
+
+      		var directionalLight = new THREE.DirectionalLight( 0xffffff );
+      		directionalLight.position.set( 1, -1, -1 ).normalize();
+      		scene.add( directionalLight );
+
+		}
+
+		function loadHandlers() {
+
+			onProgress = function ( xhr ) { // Progress Loading
+				if ( xhr.lengthComputable ) {
+					var percentComplete = xhr.loaded / xhr.total * 100;
+					console.log( Math.round( percentComplete, 2 ) + '% downloaded' );
+				}
+			};
+
+			onError = function ( xhr ) { // Error Loading
+			};
+
+			manager = new THREE.LoadingManager();
+			manager.onProgress = function ( item, loaded, total ) {
+				console.log( item, loaded, total );
+			};
+
+		}
+	      
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			
+		}
+	</script>
+
+</body>
+</html>
