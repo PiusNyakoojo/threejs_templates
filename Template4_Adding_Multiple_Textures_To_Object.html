@@ -28,7 +28,7 @@ body
 
 	<script id="fragment_shh" type="x-shader/x-fragment">
 
-	// http://stackoverflow.com/questions/16287547/multiple-transparent-textures-on-the-same-mesh-face-in-three-js
+		// http://stackoverflow.com/questions/16287547/multiple-transparent-textures-on-the-same-mesh-face-in-three-js
 		#ifdef GL_ES
 		precision highp float;
 		#endif
@@ -69,7 +69,7 @@ body
 			scene = new THREE.Scene();
 
 			camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 5000 );
-	        camera.position.z = 30; 
+			camera.position.z = 30;
 
 			controls = new THREE.OrbitControls( camera );
 			controls.damping = 0.2;
@@ -82,7 +82,6 @@ body
 
       		initLights();
       		loadHandlers();
-
       		loadObject( '../Models/Location_Of_Object/model.obj',  loadMaterial( "../Textures/Location_Of_Textures/" ) );
 
 			// Events
